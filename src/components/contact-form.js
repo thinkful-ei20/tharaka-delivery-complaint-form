@@ -1,10 +1,14 @@
 import React from 'react';
 import {reduxForm, Field, SubmissionError, focus} from 'redux-form';
 import Input from './input';
-import {required, nonEmpty} from '../validators'
+import {required, nonEmpty, fiveChar, isNum} from '../validators'
 
 export class ContactForm extends React.Component {
     onSubmit(values) {
+        console.log(values)
+        if(!values.issue) {
+            values.issue = 'not-delivered';
+        }
         return fetch('https://us-central1-delivery-form-api.cloudfunctions.net/api/report', {
             method: 'POST',
             body: JSON.stringify(values),
@@ -51,7 +55,7 @@ export class ContactForm extends React.Component {
     }
 
     render() {
-
+        
         let successMessage;
         if (this.props.submitSucceeded) {
             successMessage = (
@@ -73,14 +77,29 @@ export class ContactForm extends React.Component {
             <form onSubmit={this.props.handleSubmit(values =>
                 this.onSubmit(values)
             )}>
+                {errorMessage}
+                {successMessage}
                 <h2>Report a problem with your delivery</h2>
                 <Field
-                    name="name"
+                    name="trackingNumber"
                     type="text"
                     component={Input}
                     label="Tracking Number"
-                    validate={[required, nonEmpty]}
+                    validate={[required, nonEmpty, fiveChar, isNum]}
                 />
+
+                <div className="form-input">
+
+                    <Field name="issue" id="issue" component="select"  label="What is your issue?" >
+                        <option value="not-delivered">My delivery hasn't arrived</option>
+                        <option value="wrong-item">The wrong item was delivered</option>
+                        <option value="missing-part">Part of my order was missing</option>
+                        <option value="damaged">Some of my order arrived damaged</option>
+                        <option value="other">Other (give details below)</option>
+                    </Field>
+    
+                </div>
+
                 <Field
                     name="details"
                     element="textarea"
@@ -88,17 +107,10 @@ export class ContactForm extends React.Component {
                     label="Give more details (optional)"
                     // validate={[required, nonEmpty]}
                 />
-                {/* <Field
-                    name="magicWord"
-                    type="text"
-                    component={Input}
-                    label="What's the magic word?"
-                    validate={[required, nonEmpty]}
-                /> */}
                 <button
                     type="submit"
                     disabled={this.props.pristine || this.props.submitting}>
-                    Send message
+                    Submit
                 </button>
             </form>
         )
