@@ -5,9 +5,9 @@ import {required, nonEmpty, fiveChar, isNum} from '../validators'
 
 export class ContactForm extends React.Component {
     onSubmit(values) {
-        console.log(values)
+        console.log(values.issue)
         if(!values.issue) {
-            values.issue = 'not-delivered';
+            values.issue = 'not-delivered';//Hard coded
         }
         return fetch('https://us-central1-delivery-form-api.cloudfunctions.net/api/report', {
             method: 'POST',
@@ -105,7 +105,6 @@ export class ContactForm extends React.Component {
                     element="textarea"
                     component={Input}
                     label="Give more details (optional)"
-                    // validate={[required, nonEmpty]}
                 />
                 <button
                     type="submit"
@@ -118,7 +117,7 @@ export class ContactForm extends React.Component {
 }
 
 export default reduxForm({
-    form: 'contact',
+    form: 'complaint',
     onSubmitFail: (errors, dispatch) =>
-        dispatch(focus('contact', Object.keys(errors)[0]))
+        dispatch(focus('complaint', Object.keys(errors)[0]))
 })(ContactForm);
